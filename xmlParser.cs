@@ -15,23 +15,20 @@ namespace FRLLO_parser
         private string _rootTag;
         private string _stratcherInfo;
         private string[] nodeNline = new string[2];
-        private LogWriter logWriter = new LogWriter();
         public int Create(string Path, string rootTag)
         {
             _Path = Path;
             _rootTag = rootTag;
-            logWriter.logWriting("Выбранный файл: " + _Path);
-            logWriter.logWriting("Корневой тег записи: " + _rootTag);
             int i = 0, j = 0;
             foreach (string line in System.IO.File.ReadLines(Path))
             {
                 if (line.Contains("<" + _rootTag + ">"))
                 {
-                    i++; logWriter.logWriting(line);
+                    i++;
                 }
                 if (line.Contains("</" + _rootTag + ">"))
                 {
-                    j++; logWriter.logWriting(line);
+                    j++;
                 }
             }
             if (i == j)
