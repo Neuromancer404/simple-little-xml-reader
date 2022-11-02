@@ -3,7 +3,7 @@
 Пример работы:
 ```C#
 coolXmlReader reader = new coolXmlReader();
-if(reader.Create(path, "document"))
+if (reader.Create(filePath, FileRootTag.Text) > 0)
 {
   List<Dictionary<string, string>> data = reader.Read();
   foreach(Dictionary<string, string> item in data)
