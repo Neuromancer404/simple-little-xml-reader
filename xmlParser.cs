@@ -1,52 +1,57 @@
-namespace FRLLO_xml_parser
+using FRLLO_generic_parser;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FRLLO_parser
 {
-    internal class coolXmlReader
+    internal class XmlReader
     {
-        private StreamReader reader;
+        public int RootTagCount;
         private string _Path;
         private string _rootTag;
         private string _stratcherInfo;
-        private int nodeCount;
         private string[] nodeNline = new string[2];
-        public bool Create(string Path, string rootTag)
+        private LogWriter logWriter = new LogWriter();
+        public int Create(string Path, string rootTag)
         {
             _Path = Path;
             _rootTag = rootTag;
+            logWriter.logWriting("Выбранный файл: " + _Path);
+            logWriter.logWriting("Корневой тег записи: " + _rootTag);
             int i = 0, j = 0;
-            reader = new StreamReader(_Path);
-            string line;
-            while (reader.EndOfStream)
+            foreach (string line in System.IO.File.ReadLines(Path))
             {
-                line = reader.ReadLine();
-                if (line.Contains("<"+_rootTag+">"))
+                if (line.Contains("<" + _rootTag + ">"))
                 {
-                    i++;
+                    i++; logWriter.logWriting(line);
                 }
-                if (line.Contains("</"+_rootTag+">"))
+                if (line.Contains("</" + _rootTag + ">"))
                 {
-                    j++;
+                    j++; logWriter.logWriting(line);
                 }
             }
-            reader.Close();
-            bool status = false;
             if (i == j)
             {
-                nodeCount = i;
-                status = true;
+                RootTagCount =j;
             }
-            return status;
+
+            return RootTagCount;
         }
 
-        public List<Dictionary<string,string>> Read(string tag = null)
+        public List<Dictionary<string, string>> Read(string tag = null)
         {
             List<Dictionary<string, string>> lines = new List<Dictionary<string, string>>();
-            
+
             using (StreamReader reader = new StreamReader(_Path))
             {
-                string? line;bool check=false;
+                string line; bool check = false;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (tag!=null && line.Contains("<"+tag+">") && line.Contains("</"+tag+">"))
+                    if (tag != null && line.Contains("<" + tag + ">") && line.Contains("</" + tag + ">"))
                     {
                         string[] answr = lineReader(line, 0);
                         _stratcherInfo = answr[1];
@@ -77,20 +82,20 @@ namespace FRLLO_xml_parser
             return lines;
         }
 
-        private string[] lineReader(string line, int index,string nodeBegin="<", string nodeEnd=">")
+        private string[] lineReader(string line, int index, string nodeBegin = "<", string nodeEnd = ">")
         {
             int fu = line.IndexOf(nodeBegin);
             int su = line.IndexOf(nodeEnd);
-            string data="";
-            
-            for (int i = fu+1; i < su; i++)
+            string data = "";
+
+            for (int i = fu + 1; i < su; i++)
             {
                 data += line[i];
             }
             nodeNline[index] = data;
             if (line.Contains($"</{data}>"))
             {
-                lineReader(line, 1, ">", "</"+data+">");
+                lineReader(line, 1, ">", "</" + data + ">");
             }
             return nodeNline;
         }
